@@ -56,6 +56,16 @@ module API
         end
       end
 
+      def authenticate_account_manager
+        begin
+          command = Authentication::AuthorizeApiRequest.call(request.headers, 'account_manager')
+          @current_user = command.result
+          error!({error: command.errors[:token][0], status: 400}) unless @current_user
+        rescue Exception => e
+          error!({error: e.message, status: 400, message: 'something went wrong, Try later'})
+        end
+      end
+
       def find_business
         begin
           if params[:business_id].present?
@@ -70,8 +80,34 @@ module API
       end
 
       def find_product
-        return @user_business.products.find{|e| e.id == params[:product_id].to_i}
-        error!({error: 'item not found', status: 400}) unless @item
+        begin
+          product = @user_business.products.find{|e| e.id == params[:product_id].to_i}
+          error!({error: 'product not found', status: 400}) unless product
+          return product
+        rescue Exception => e
+          error!({error: e.message, status: 400, message: 'something went wrong, Try later'})
+        end
+      end
+
+      def find_order
+        begin
+          order = @user_business.orders.find{|e| e.id == params[:order_id].to_i}
+          error!({error: 'order not found', status: 400}) unless order
+          return order
+        rescue Exception => e
+          error!({error: e.message, status: 400, message: 'something went wrong, Try later'})
+        end
+      end
+
+      def find_return
+        begin
+          order = find_order
+          order_return = order.returns.find{|e| e.id == params[:return_id].to_i}
+          error!({error: 'return not found', status: 400}) unless order_return
+          return order_return
+        rescue Exception => e
+          error!({error: e.message, status: 400, message: 'something went wrong, Try later'})
+        end
       end
 
       def find_business_by_id(id)

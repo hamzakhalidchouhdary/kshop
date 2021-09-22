@@ -16,6 +16,8 @@ module API
         business_manager
       elsif @user_type === 'store_manager'
         store_manager
+      elsif @user_type === 'account_manager'
+        account_manager
       else
         owner
       end
@@ -61,6 +63,24 @@ module API
           unless _manager
             _user = User.find(@decoded_auth_token[:user_id]) 
             if _user && (_user.staff.role.name === 'store manager')
+              @user ||= _user
+            else
+              @user || errors.add(:token, 'access denied') && nil 
+            end
+          else
+            @user ||= _manager
+          end
+        else
+          @user ||= errors.add(:token, 'token expired') && nil
+        end
+      end
+
+      def account_manager
+        if decoded_auth_token
+         _manager = business_manager
+          unless _manager
+            _user = User.find(@decoded_auth_token[:user_id]) 
+            if _user && (_user.staff.role.name === 'account manager')
               @user ||= _user
             else
               @user || errors.add(:token, 'access denied') && nil 

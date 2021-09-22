@@ -11,6 +11,7 @@ module API
       mount V1::Business_
       mount V1::Staff_
       mount V1::Product_
+      mount V1::Order_
     end
   end
 end

@@ -11,7 +11,7 @@ module API
         end
         get '', root: :product do
           begin
-            return { products: @user_business.products, status: 200}
+            return {products: @user_business.products, status: 200}
           rescue Exception => e
             error!({error: e.message, status: 400, message: 'Something went wrong, Try later'})
           end
