@@ -2,6 +2,7 @@ module API
   module V1
     class Product_ < Grape::API
       before {authenticate_store_manager}
+      before {organization_active?}
       before {find_business}
 
       resource :product do
@@ -22,8 +23,31 @@ module API
         end
         get ':product_id', root: :product do
           begin
-            p params[:product_id]
             return { product: find_product, status: 200}
+          rescue Exception => e
+            error!({error: e.message, status: 400, message: 'Something went wrong, Try later'})
+          end
+        end
+
+        desc 'get a order for a product'
+        params do
+        end
+        get ':product_id/order', root: :product do
+          begin
+            product = find_product
+            t = Time.at(product.created_at)
+            orders = product.orders
+            sold_items = product.order_items
+            sold_stock = sold_items.map(&:quantity).inject(0, &:+)
+            earning = sold_items.map(&:price).inject(0, &:+)
+            return { 
+              order: orders.count, 
+              sold_stock: sold_stock, 
+              invested_amount: sold_stock * product.cost_price,
+              except_earning: sold_stock * product.sell_price,
+              actual_earning: earning, 
+              time: t.strftime("%d of %B, %Y"),
+              status: 200}
           rescue Exception => e
             error!({error: e.message, status: 400, message: 'Something went wrong, Try later'})
           end

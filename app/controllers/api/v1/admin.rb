@@ -16,6 +16,45 @@ module API
             error!({message: 'something went wrong, Try later', status: 400, error: e.message})
           end
         end
+        resource 'organization/:organization_id' do
+          desc "get organization"
+          params do
+          end
+          get '',root: :admin do
+            begin
+              return {organization: Organization.find(params[:organization_id])}
+            rescue Exception => e
+              error!({message: 'something went wrong, Try later', status: 400, error: e.message})
+            end
+          end
+
+          desc 'suspend organization'
+          params do
+          end
+          post "suspend", root: :admin do
+            begin
+              org = Organization.find(params[:organization_id])
+              return {status: 200, message: "organization has been suspended", org: org} if org.update(status:'suspended')
+              return {status: 400, message: "can not change organization status", org: org}
+            rescue Exception => e
+              error!({message: 'something went wrong, Try later', status: 400, error: e.message})
+            end
+          end
+
+          desc 'activate organization'
+          params do
+          end
+          post "activate", root: :admin do
+            begin
+              org = Organization.find(params[:organization_id])
+              return {status: 200, message: "organization has been activated", org: org} if org.update(status:'active')
+              return {status: 400, message: "can not change organization status", org: org}
+            rescue Exception => e
+              error!({message: 'something went wrong, Try later', status: 400, error: e.message})
+            end
+          end
+
+        end
 
         desc "add role"
         params do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_22_095055) do
+ActiveRecord::Schema.define(version: 2021_09_23_170905) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -53,6 +53,15 @@ ActiveRecord::Schema.define(version: 2021_09_22_095055) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["business_id"], name: "index_orders_on_business_id"
+  end
+
+  create_table "organization_payments", force: :cascade do |t|
+    t.bigint "organization_id"
+    t.float "payable"
+    t.boolean "is_paid"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["organization_id"], name: "index_organization_payments_on_organization_id"
   end
 
   create_table "organizations", force: :cascade do |t|
@@ -115,6 +124,15 @@ ActiveRecord::Schema.define(version: 2021_09_22_095055) do
     t.string "name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "staff_payments", force: :cascade do |t|
+    t.bigint "staff_id"
+    t.float "payable"
+    t.boolean "is_paid"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["staff_id"], name: "index_staff_payments_on_staff_id"
   end
 
   create_table "staffs", force: :cascade do |t|

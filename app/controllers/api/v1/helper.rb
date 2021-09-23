@@ -74,6 +74,7 @@ module API
             @user_business = @current_user.staff.business if @current_user.staff
           end
           error!({error: 'business not found', status: 400}) unless @user_business
+          return @user_business
         rescue Exception => e
           error!({error: e.message, status: 400, message: 'something went wrong, Try later'})
         end
@@ -110,27 +111,14 @@ module API
         end
       end
 
-      def find_business_by_id(id)
-        shop = @current_user.organization.businesses.find{|e| e.id == id.to_i}
-        error!({error: 'business not found', status: 400}) unless shop
-        return shop
-      end
-
       def find_staff
-        @staff = @user_shop.staffs.find{|e| e.id == params[:staff_id].to_i}
-        error!({error: 'staff not found', status: 400}) unless @staff
-      end
-
-      def find_staff_by_id(id)
-        staff = @current_user.organization.staff.find{|e| e.id == id.to_i}
-        error!({error: 'staff not found', status: 400}) unless staff
-        return staff
-      end
-
-      def find_staff_by_username(username)
-        staff = @current_user.organization.staff.find{|e| e.username == username}
-        error!({error: 'staff not found', status: 400}) unless staff
-        return staff
+        begin
+          staff = @user_business.staffs.find{|e| e.id == params[:staff_id].to_i}
+          error!({error: 'staff not found', status: 400}) unless staff
+          return staff
+        rescue Exception => e
+          error!({error: e.message, status: 400, message: 'something went wrong, Try later'})
+        end
       end
 
       def organization_exisit?

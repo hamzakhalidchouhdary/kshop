@@ -2,6 +2,7 @@ module API
   module V1
     class Organization_ < Grape::API
       before { authenticate }
+      before {organization_active?}
 
       resource :organization do
         desc 'Get Organization'
@@ -13,7 +14,8 @@ module API
             return {
               organization: @current_user.organization,
               businesses: @current_user.organization.businesses,
-              staffs: @current_user.organization.staffs
+              staffs: @current_user.organization.staffs,
+              payable: @current_user.organization.organization_payments
             }
           rescue Exception => e
             error!({error: e.message, status: 400, message: 'Something went wrong, Try later'})
@@ -93,7 +95,7 @@ module API
         desc 'return specified business'
         get "business/:business_id", root: :organization do
           begin
-            return {business: find_business_by_id(params[:business_id])}
+            return {business: find_business}
           rescue Exception => e
             error!({message: 'something went wrong, Try later', status: 400, error: e.message})
           end

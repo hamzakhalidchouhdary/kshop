@@ -2,6 +2,7 @@ module API
   module V1
     class Order_ < Grape::API
       before {authenticate_account_manager}
+      before {organization_active?}
       before {find_business}
       
       resource :order do
