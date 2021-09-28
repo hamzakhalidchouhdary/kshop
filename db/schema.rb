@@ -10,10 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_23_170905) do
+ActiveRecord::Schema.define(version: 2021_09_24_043855) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "business_categories", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
 
   create_table "businesses", force: :cascade do |t|
     t.bigint "organization_id"
@@ -26,6 +32,25 @@ ActiveRecord::Schema.define(version: 2021_09_23_170905) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["business_category_id"], name: "index_businesses_on_business_category_id"
     t.index ["organization_id"], name: "index_businesses_on_organization_id"
+  end
+
+  create_table "offer_types", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "offers", force: :cascade do |t|
+    t.bigint "business_id"
+    t.bigint "offer_type_id"
+    t.string "name"
+    t.float "discount"
+    t.float "min_amount"
+    t.datetime "end_on"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["business_id"], name: "index_offers_on_business_id"
+    t.index ["offer_type_id"], name: "index_offers_on_offer_type_id"
   end
 
   create_table "order_items", force: :cascade do |t|

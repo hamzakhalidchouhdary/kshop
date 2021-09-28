@@ -137,6 +137,19 @@ module API
         end
 
         # package routes end
+
+        desc 'create offer type'
+        params do
+          requires :name, type: String, regexp: /\A[a-zA-Z ]+\Z/, allow_blank: {value: false, message: 'can not be empty'}
+        end
+        post '/offer_type', root: :admin do
+          begin
+            allowed_params = declared(params, include_missing: false, include_parants_params: false)
+            return {offer_created: OfferType.new(allowed_params).save, status: 200}
+          rescue Exception => e
+            error!({error: e.message, message: 'something went wrong, Try later', status: 400})
+          end
+        end
       end
     end
   end

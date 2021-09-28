@@ -121,6 +121,16 @@ module API
         end
       end
 
+      def find_offer
+        begin
+          offer = @user_business.offers.find{|e| e.id == params[:staff_id].to_i}
+          error!({error: 'offer not found', status: 400}) unless offer
+          return offer
+        rescue Exception => e
+          error!({error: e.message, status: 400, message: 'something went wrong, Try later'})
+        end
+      end
+
       def organization_exisit?
         error!({error: 'no organization found', status: 400}) unless @current_user.organization
         nil

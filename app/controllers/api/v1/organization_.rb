@@ -82,20 +82,10 @@ module API
           end
         end
 
-        # business routes start
         desc 'return all business'
         get "business", root: :organization do
           begin
             return {business: @current_user.organization.businesses}
-          rescue Exception => e
-            error!({message: 'something went wrong, Try later', status: 400, error: e.message})
-          end
-        end
-
-        desc 'return specified business'
-        get "business/:business_id", root: :organization do
-          begin
-            return {business: find_business}
           rescue Exception => e
             error!({message: 'something went wrong, Try later', status: 400, error: e.message})
           end
@@ -121,25 +111,6 @@ module API
           end            
         end
 
-        desc 'update business'
-        params do
-          requires :business_category_id, type: Integer, regexp: /\A[0-9]+\Z/
-          requires :name, type: String, regexp: /\A[a-zA-Z ]+\Z/
-          requires :address, type: String, regexp: /\A[\w#\-\.,\/ ]+\Z/
-          requires :phone_no, type: String, regexp: /\A(\+).[0-9]+\Z/
-          requires :email, type: String, regexp: /\A[a-zA-Z0-9._]+@[a-z]+\.[a-z]+\Z/
-        end
-        put "business/:business_id", root: :organization do
-          begin
-            business = find_business_by_id(params[:business_id])
-            allowed_params = declared(params, include_missing: false)
-            business.update(allowed_params)
-            return {business: business, message: 'business has been updated', status: 200}
-          rescue Exception => e
-            error!({message: 'something went wrong, Try later', status: 400, error: e.message})
-          end            
-        end
-
         desc 'delete a business'
         params do
         end
@@ -156,7 +127,7 @@ module API
         desc 'delete all business'
         params do
         end
-        delete "business/", root: :organization do
+        delete "business", root: :organization do
           begin
             @current_user.organization.businesses.delete_all
             return {message: 'business have been deleted', status: 200}
@@ -165,7 +136,6 @@ module API
           end            
         end
 
-        # business routes end
       end
     end
   end
