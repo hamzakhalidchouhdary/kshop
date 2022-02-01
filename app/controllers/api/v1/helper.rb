@@ -56,6 +56,16 @@ module API
         end
       end
 
+      def authenticate_account_manager
+        begin
+          command = Authentication::AuthorizeApiRequest.call(request.headers, 'account_manager')
+          @current_user = command.result
+          error!({error: command.errors[:token][0], status: 400}) unless @current_user
+        rescue Exception => e
+          error!({error: e.message, status: 400, message: 'something went wrong, Try later'})
+        end
+      end
+
       def find_business
         begin
           if params[:business_id].present?
@@ -64,37 +74,61 @@ module API
             @user_business = @current_user.staff.business if @current_user.staff
           end
           error!({error: 'business not found', status: 400}) unless @user_business
+          return @user_business
         rescue Exception => e
           error!({error: e.message, status: 400, message: 'something went wrong, Try later'})
         end
       end
 
       def find_product
-        return @user_business.products.find{|e| e.id == params[:product_id].to_i}
-        error!({error: 'item not found', status: 400}) unless @item
+        begin
+          product = @user_business.products.find{|e| e.id == params[:product_id].to_i}
+          error!({error: 'product not found', status: 400}) unless product
+          return product
+        rescue Exception => e
+          error!({error: e.message, status: 400, message: 'something went wrong, Try later'})
+        end
       end
 
-      def find_business_by_id(id)
-        shop = @current_user.organization.businesses.find{|e| e.id == id.to_i}
-        error!({error: 'business not found', status: 400}) unless shop
-        return shop
+      def find_order
+        begin
+          order = @user_business.orders.find{|e| e.id == params[:order_id].to_i}
+          error!({error: 'order not found', status: 400}) unless order
+          return order
+        rescue Exception => e
+          error!({error: e.message, status: 400, message: 'something went wrong, Try later'})
+        end
+      end
+
+      def find_return
+        begin
+          order = find_order
+          order_return = order.returns.find{|e| e.id == params[:return_id].to_i}
+          error!({error: 'return not found', status: 400}) unless order_return
+          return order_return
+        rescue Exception => e
+          error!({error: e.message, status: 400, message: 'something went wrong, Try later'})
+        end
       end
 
       def find_staff
-        @staff = @user_shop.staffs.find{|e| e.id == params[:staff_id].to_i}
-        error!({error: 'staff not found', status: 400}) unless @staff
+        begin
+          staff = @user_business.staffs.find{|e| e.id == params[:staff_id].to_i}
+          error!({error: 'staff not found', status: 400}) unless staff
+          return staff
+        rescue Exception => e
+          error!({error: e.message, status: 400, message: 'something went wrong, Try later'})
+        end
       end
 
-      def find_staff_by_id(id)
-        staff = @current_user.organization.staff.find{|e| e.id == id.to_i}
-        error!({error: 'staff not found', status: 400}) unless staff
-        return staff
-      end
-
-      def find_staff_by_username(username)
-        staff = @current_user.organization.staff.find{|e| e.username == username}
-        error!({error: 'staff not found', status: 400}) unless staff
-        return staff
+      def find_offer
+        begin
+          offer = @user_business.offers.find{|e| e.id == params[:staff_id].to_i}
+          error!({error: 'offer not found', status: 400}) unless offer
+          return offer
+        rescue Exception => e
+          error!({error: e.message, status: 400, message: 'something went wrong, Try later'})
+        end
       end
 
       def organization_exisit?

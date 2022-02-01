@@ -2,13 +2,24 @@ module API
   module V1
     class Staff_ < Grape::API
       before {authenticate_business_manager}
+      before {organization_active?}
       before {find_business}
 
       resource :staff do
-        desc 'get staff of business'
+        desc 'get staffs of business'
         get '', root: :staff do
           begin
             return {staff: @user_business.staffs, user: @current_user}
+          rescue Exception => e
+            error!({error: e.message, status: 400, message: 'Something went wrong, Try later'})
+          end
+        end
+
+        desc 'get a staff of business'
+        get ':staff_id', root: :staff do
+          begin
+            staff = find_staff
+            return {staff: staff, payables: staff.staff_payments}
           rescue Exception => e
             error!({error: e.message, status: 400, message: 'Something went wrong, Try later'})
           end
@@ -46,7 +57,7 @@ module API
         put ':staff_id', root: :staff do
           begin
             allowed_params = declared(params, include_missing: false)
-            staff = @current_user.organization.staffs.find{|e| e.id == params[:staff_id].to_i}
+            staff = find_staff
             return {message: 'staff updated', status: 200} if staff.update(params)
             return {message: 'can not update staff', status: 500}
           rescue Exception => e
@@ -60,7 +71,7 @@ module API
         post ':staff_id/paid', root: :staff do
           begin
             allowed_params = declared(params, include_missing: false)
-            staff = @current_user.organization.staffs.find{|e| e.id == params[:staff_id].to_i}
+            staff = find_staff
             return {message: 'salary status updated', status: 200} if staff.update(salary_paid: true)
             return {message: 'can not update salary status', status: 500}
           rescue Exception => e

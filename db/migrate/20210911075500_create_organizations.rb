@@ -7,8 +7,7 @@ class CreateOrganizations < ActiveRecord::Migration[6.1]
       t.string :address
       t.string :phone_no
       t.string :email
-      t.float :package_price
-      t.integer :business_limit
+      t.integer :package_price
       t.string :status
 
 
